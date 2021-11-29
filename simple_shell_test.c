@@ -30,7 +30,7 @@ int main(void)
 		{
 			putchar('\n');
 			free(buffer);
-			exit(0);
+			exit(-1);
 		}
 
 		if (strcmp(buffer, "exit\n") == 0)
@@ -38,9 +38,25 @@ int main(void)
 			free(buffer);
 			exit(0);
 		}
-		buffer[strlen(buffer) - 1] = '\0';
+		if (buffer[strlen(buffer) - 1] == '\0')
+		{
+			buffer[strlen(buffer) - 1] = '\0';
+		}
 		argv = splitter(buffer);
 
+		if (buffer[0] == '.' && buffer[1] == '/')
+		{
+			if (access(argv[0], F_OK) == 0)
+			{
+				execArgs(argv);
+			}
+			else
+			{
+				printf("%s: not found\n", argv[0]);
+			}
+		}
+		else
+		{
 			if (stat(argv[0], &st) == 0)
 			{
 				execArgs(argv);
@@ -49,6 +65,7 @@ int main(void)
 			{
 				printf("%s: not found\n", argv[0]);
 			}
+		}
 
 	} while (length != -1);
 
@@ -74,5 +91,9 @@ int execArgs(char **argv)
 	{
 		wait(&status);
 	}
+	return (0);
+}
+int checkBuiltIn(char **parsed)
+{
 	return (0);
 }
