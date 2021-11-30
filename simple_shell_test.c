@@ -10,6 +10,7 @@ char **splitter(char fun[]);
 int execArgs(char **argv);
 int executePath(char *execPath, char **argv);
 char **_getPath(void);
+char *_getenv(const char *name);
 
 int main(void)
 {
@@ -43,8 +44,10 @@ int main(void)
 			free(buffer);
 			exit(0);
 		}
-
-		buffer[strlen(buffer) - 1] = '\0';
+		if (buffer[strlen(buffer) - 1] == '\n')
+		{
+			buffer[strlen(buffer) - 1] = '\0';
+		}
 		argv = splitter(buffer);
 
 		if (strchr(argv[0], '/'))
@@ -135,7 +138,7 @@ char **_getPath(void)
 	int i;
 	char **splitpath;
 
-	path = getenv("PATH");
+	path = _getenv("PATH");
 	splitpath = malloc(sizeof(char) * 1024);
 
 	pathtok = strtok(path, ":");
@@ -147,4 +150,15 @@ char **_getPath(void)
 
 	}
 	return (splitpath);
+}
+char *_getenv(const char *name)
+{
+	int i;
+	size_t l = strlen(name);
+
+	if (!__environ || !*name || strchr(name, '=')) return (NULL);
+	for (i=0; __environ[i] && (strncmp(name, __environ[i], l)
+		|| __environ[i][l] != '='); i++);
+	if (__environ[i]) return __environ[i] + l+1;
+	return (NULL);
 }
